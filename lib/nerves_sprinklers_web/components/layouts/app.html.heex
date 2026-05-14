@@ -1,0 +1,24 @@
+<div class="min-h-full">
+  <nav class="bg-green-700">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex h-16 items-center justify-between">
+        <div class="flex items-center gap-6">
+          <span class="text-white font-semibold text-lg">Sprinklers</span>
+          <.link navigate={~p"/"} class="text-green-200 hover:text-white text-sm">Dashboard</.link>
+          <.link navigate={~p"/settings"} class="text-green-200 hover:text-white text-sm">Settings</.link>
+        </div>
+        <div>
+          <form action="/logout" method="post" class="inline">
+            <input type="hidden" name="_method" value="delete" />
+            <input type="hidden" name="_csrf_token" value={get_csrf_token()} />
+            <button type="submit" class="text-green-200 hover:text-white text-sm">Sign out</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <.flash_group flash={@flash} />
+    {@inner_content}
+  </main>
+</div>

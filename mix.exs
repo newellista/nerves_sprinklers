@@ -14,7 +14,8 @@ defmodule NervesSprinklers.MixProject do
       listeners: listeners(Mix.target(), Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      releases: [{@app, release()}]
+      releases: [{@app, release()}],
+      aliases: aliases()
     ]
   end
 
@@ -46,6 +47,20 @@ defmodule NervesSprinklers.MixProject do
       # Dependencies for all targets except :host
       {:nerves_pack, "~> 0.7.1", targets: @all_targets},
 
+      # Application dependencies
+      {:ecto_sqlite3, "~> 0.18"},
+      {:phoenix, "~> 1.8"},
+      {:phoenix_live_view, "~> 1.0"},
+      {:phoenix_html, "~> 4.0"},
+      {:plug_cowboy, "~> 2.7"},
+      {:esbuild, "~> 0.9", runtime: Mix.env() == :dev},
+      {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
+      {:circuits_gpio, "~> 2.1", targets: @all_targets},
+      {:libcluster, "~> 3.3"},
+      {:timex, "~> 3.7"},
+      {:telemetry_metrics, "~> 1.0"},
+      {:telemetry_poller, "~> 1.0"},
+
       # Dependencies for specific targets
       # NOTE: It's generally low risk and recommended to follow minor version
       # bumps to Nerves systems. Since these include Linux kernel and Erlang
@@ -73,7 +88,18 @@ defmodule NervesSprinklers.MixProject do
     ]
   end
 
-  # Uncomment the following line if using Phoenix > 1.8.
-  # defp listeners(:host, :dev), do: [Phoenix.CodeReloader]
+  defp aliases do
+    [
+      "assets.build": ["tailwind nerves_sprinklers", "esbuild nerves_sprinklers"],
+      "assets.deploy": [
+        "tailwind nerves_sprinklers --minify",
+        "esbuild nerves_sprinklers --minify",
+        "phx.digest"
+      ],
+      setup: ["deps.get", "assets.build"]
+    ]
+  end
+
+  defp listeners(:host, :dev), do: [Phoenix.CodeReloader]
   defp listeners(_, _), do: []
 end

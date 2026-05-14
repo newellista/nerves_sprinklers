@@ -9,3 +9,8 @@ erl_crash.dump
 /config/*.secret.exs
 .elixir_ls/
 .worktrees/
+*.db
+*.db-shm
+*.db-wal
+sprinklers_auth_dev.dat
+/priv/static/assets/

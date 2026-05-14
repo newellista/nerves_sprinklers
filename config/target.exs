@@ -95,8 +95,32 @@ config :mdns_lite,
     }
   ]
 
-# Import target specific config. This must remain at the bottom
-# of this file so it overrides the configuration defined above.
-# Uncomment to use target specific configurations
+config :nerves_sprinklers, NervesSprinklers.Repo,
+  database: "/data/sprinklers.db",
+  pool_size: 5
 
-# import_config "#{Mix.target()}.exs"
+config :ecto, repos: [NervesSprinklers.Repo]
+
+config :libcluster,
+  topologies: [
+    sprinklers: [
+      strategy: Cluster.Strategy.Gossip,
+      config: [
+        port: 45892,
+        if_addr: "0.0.0.0",
+        multicast_addr: "230.1.1.1",
+        multicast_ttl: 1
+      ]
+    ]
+  ]
+
+config :nerves_sprinklers, NervesSprinklersWeb.Endpoint,
+  http: [port: 80],
+  secret_key_base: System.get_env("SECRET_KEY_BASE") || :crypto.strong_rand_bytes(64) |> Base.encode64() |> binary_part(0, 64),
+  live_view: [signing_salt: System.get_env("LIVE_VIEW_SALT") || :crypto.strong_rand_bytes(16) |> Base.encode64() |> binary_part(0, 16)],
+  server: true
+
+# Import device-specific config. Set MIX_TARGET_CONFIG to "coordinator" or "worker_<name>".
+# Example: MIX_TARGET_CONFIG=coordinator mix firmware --target rpi3
+device_config = System.get_env("MIX_TARGET_CONFIG", "coordinator")
+import_config "#{device_config}.exs"
