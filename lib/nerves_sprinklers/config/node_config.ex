@@ -1,4 +1,6 @@
 defmodule NervesSprinklers.Config.NodeConfig do
+  @moduledoc false
+
   def role, do: Application.fetch_env!(:nerves_sprinklers, :role)
 
   def coordinator?, do: role() == :coordinator

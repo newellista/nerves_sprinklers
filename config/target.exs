@@ -116,8 +116,14 @@ config :libcluster,
 
 config :nerves_sprinklers, NervesSprinklersWeb.Endpoint,
   http: [port: 80],
-  secret_key_base: System.get_env("SECRET_KEY_BASE") || :crypto.strong_rand_bytes(64) |> Base.encode64() |> binary_part(0, 64),
-  live_view: [signing_salt: System.get_env("LIVE_VIEW_SALT") || :crypto.strong_rand_bytes(16) |> Base.encode64() |> binary_part(0, 16)],
+  secret_key_base:
+    System.get_env("SECRET_KEY_BASE") ||
+      :crypto.strong_rand_bytes(64) |> Base.encode64() |> binary_part(0, 64),
+  live_view: [
+    signing_salt:
+      System.get_env("LIVE_VIEW_SALT") ||
+        :crypto.strong_rand_bytes(16) |> Base.encode64() |> binary_part(0, 16)
+  ],
   server: true
 
 # Import device-specific config. Set MIX_TARGET_CONFIG to "coordinator" or "worker_<name>".

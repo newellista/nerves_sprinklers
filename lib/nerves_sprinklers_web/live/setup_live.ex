@@ -6,7 +6,11 @@ defmodule NervesSprinklersWeb.SetupLive do
     if NervesSprinklers.Auth.password_set?() do
       {:ok, push_navigate(socket, to: "/login")}
     else
-      {:ok, assign(socket, form: to_form(%{"password" => "", "password_confirmation" => ""}), error: nil)}
+      {:ok,
+       assign(socket,
+         form: to_form(%{"password" => "", "password_confirmation" => ""}),
+         error: nil
+       )}
     end
   end
 

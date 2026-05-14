@@ -60,6 +60,8 @@ defmodule NervesSprinklers.MixProject do
       {:timex, "~> 3.7"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:mix_audit, "~> 2.1", only: [:dev, :test], runtime: false},
 
       # Dependencies for specific targets
       # NOTE: It's generally low risk and recommended to follow minor version
@@ -72,7 +74,7 @@ defmodule NervesSprinklers.MixProject do
       {:nerves_system_rpi2, "~> 2.0", runtime: false, targets: :rpi2},
       {:nerves_system_rpi3, "~> 2.0", runtime: false, targets: :rpi3},
       {:nerves_system_rpi4, "~> 2.0", runtime: false, targets: :rpi4},
-      {:nerves_system_rpi5, "~> 2.0", runtime: false, targets: :rpi5},
+      {:nerves_system_rpi5, "~> 2.0", runtime: false, targets: :rpi5}
     ]
   end
 
@@ -96,7 +98,15 @@ defmodule NervesSprinklers.MixProject do
         "esbuild nerves_sprinklers --minify",
         "phx.digest"
       ],
-      setup: ["deps.get", "assets.build"]
+      setup: ["deps.get", "assets.build"],
+      ci: [
+        "compile --warnings-as-errors",
+        "format --check-formatted",
+        "credo --strict",
+        "deps.audit",
+        "cmd mix hex.audit",
+        "cmd sh -c \"MIX_ENV=test mix test\""
+      ]
     ]
   end
 

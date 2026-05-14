@@ -1,4 +1,6 @@
 defmodule NervesSprinklersWeb.Auth do
+  @moduledoc false
+
   import Phoenix.LiveView
   import Phoenix.Component
 

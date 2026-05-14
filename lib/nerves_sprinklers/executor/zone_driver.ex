@@ -1,4 +1,6 @@
 defmodule NervesSprinklers.Executor.ZoneDriver do
+  @moduledoc false
+
   alias NervesSprinklers.Gpio.GpioServer
   require Logger
 

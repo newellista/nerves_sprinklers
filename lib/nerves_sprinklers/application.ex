@@ -9,7 +9,11 @@ defmodule NervesSprinklers.Application do
   def start(_type, _args) do
     children =
       [
-        {Cluster.Supervisor, [Application.get_env(:libcluster, :topologies, []), [name: NervesSprinklers.ClusterSupervisor]]},
+        {Cluster.Supervisor,
+         [
+           Application.get_env(:libcluster, :topologies, []),
+           [name: NervesSprinklers.ClusterSupervisor]
+         ]},
         NervesSprinklers.Gpio.GpioServer
       ] ++ coordinator_children()
 

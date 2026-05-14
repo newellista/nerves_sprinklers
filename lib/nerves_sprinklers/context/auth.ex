@@ -1,4 +1,6 @@
 defmodule NervesSprinklers.Auth do
+  @moduledoc false
+
   @iterations 200_000
   @key_length 32
 

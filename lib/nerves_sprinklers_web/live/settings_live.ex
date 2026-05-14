@@ -7,13 +7,18 @@ defmodule NervesSprinklersWeb.SettingsLive do
   end
 
   @impl true
-  def handle_event("change_password", %{"current" => current, "password" => new_pw, "password_confirmation" => confirm}, socket) do
+  def handle_event(
+        "change_password",
+        %{"current" => current, "password" => new_pw, "password_confirmation" => confirm},
+        socket
+      ) do
     cond do
       not NervesSprinklers.Auth.verify_password(current) ->
         {:noreply, assign(socket, error: "Current password is incorrect.", success: false)}
 
       byte_size(new_pw) < 8 ->
-        {:noreply, assign(socket, error: "New password must be at least 8 characters.", success: false)}
+        {:noreply,
+         assign(socket, error: "New password must be at least 8 characters.", success: false)}
 
       new_pw != confirm ->
         {:noreply, assign(socket, error: "Passwords do not match.", success: false)}

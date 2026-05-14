@@ -1,11 +1,13 @@
 defmodule NervesSprinklersWeb.SessionController do
+  @moduledoc false
+
   use NervesSprinklersWeb, :controller
 
   def new(conn, _params) do
-    if not NervesSprinklers.Auth.password_set?() do
-      redirect(conn, to: "/setup")
-    else
+    if NervesSprinklers.Auth.password_set?() do
       render(conn, :new)
+    else
+      redirect(conn, to: "/setup")
     end
   end
 

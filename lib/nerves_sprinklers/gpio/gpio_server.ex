@@ -1,4 +1,6 @@
 defmodule NervesSprinklers.Gpio.GpioServer do
+  @moduledoc false
+
   use GenServer
   require Logger
 

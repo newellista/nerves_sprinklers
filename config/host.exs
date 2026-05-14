@@ -3,7 +3,7 @@ import Config
 # Host role config — coordinator by default for local dev
 config :nerves_sprinklers,
   role: :coordinator,
-  node_name: :"sprinklers@localhost",
+  node_name: :sprinklers@localhost,
   timezone: "America/Chicago",
   auth_settings_file: Path.expand("../sprinklers_auth_dev.dat", __DIR__)
 
@@ -29,7 +29,8 @@ config :ecto, repos: [NervesSprinklers.Repo]
 config :esbuild,
   version: "0.17.11",
   nerves_sprinklers: [
-    args: ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
+    args:
+      ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
     cd: Path.expand("../assets", __DIR__),
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ]
