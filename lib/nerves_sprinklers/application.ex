@@ -1,43 +1,34 @@
 defmodule NervesSprinklers.Application do
-  # See https://hexdocs.pm/elixir/Application.html
-  # for more information on OTP Applications
   @moduledoc false
 
   use Application
+
+  alias NervesSprinklers.Config.NodeConfig
 
   @impl true
   def start(_type, _args) do
     children =
       [
-        # Children for all targets
-        # Starts a worker by calling: NervesSprinklers.Worker.start_link(arg)
-        # {NervesSprinklers.Worker, arg},
-      ] ++ target_children()
+        {Cluster.Supervisor,
+         [
+           Application.get_env(:libcluster, :topologies, []),
+           [name: NervesSprinklers.ClusterSupervisor]
+         ]},
+        NervesSprinklers.Gpio.GpioServer
+      ] ++ coordinator_children()
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: NervesSprinklers.Supervisor]
     Supervisor.start_link(children, opts)
   end
 
-  # List all child processes to be supervised
-  if Mix.target() == :host do
-    defp target_children() do
+  defp coordinator_children do
+    if NodeConfig.coordinator?() do
       [
-        # Children that only run on the host during development or test.
-        # In general, prefer using `config/host.exs` for differences.
-        #
-        # Starts a worker by calling: Host.Worker.start_link(arg)
-        # {Host.Worker, arg},
+        NervesSprinklers.Repo,
+        NervesSprinklersWeb.Endpoint
       ]
-    end
-  else
-    defp target_children() do
-      [
-        # Children for all targets except host
-        # Starts a worker by calling: Target.Worker.start_link(arg)
-        # {Target.Worker, arg},
-      ]
+    else
+      []
     end
   end
 end

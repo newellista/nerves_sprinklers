@@ -14,7 +14,8 @@ defmodule NervesSprinklers.MixProject do
       listeners: listeners(Mix.target(), Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      releases: [{@app, release()}]
+      releases: [{@app, release()}],
+      aliases: aliases()
     ]
   end
 
@@ -46,6 +47,22 @@ defmodule NervesSprinklers.MixProject do
       # Dependencies for all targets except :host
       {:nerves_pack, "~> 0.7.1", targets: @all_targets},
 
+      # Application dependencies
+      {:ecto_sqlite3, "~> 0.18"},
+      {:phoenix, "~> 1.8"},
+      {:phoenix_live_view, "~> 1.0"},
+      {:phoenix_html, "~> 4.0"},
+      {:plug_cowboy, "~> 2.7"},
+      {:esbuild, "~> 0.9", runtime: Mix.env() == :dev},
+      {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
+      {:circuits_gpio, "~> 2.1", targets: @all_targets},
+      {:libcluster, "~> 3.3"},
+      {:timex, "~> 3.7"},
+      {:telemetry_metrics, "~> 1.0"},
+      {:telemetry_poller, "~> 1.0"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:mix_audit, "~> 2.1", only: [:dev, :test], runtime: false},
+
       # Dependencies for specific targets
       # NOTE: It's generally low risk and recommended to follow minor version
       # bumps to Nerves systems. Since these include Linux kernel and Erlang
@@ -57,7 +74,7 @@ defmodule NervesSprinklers.MixProject do
       {:nerves_system_rpi2, "~> 2.0", runtime: false, targets: :rpi2},
       {:nerves_system_rpi3, "~> 2.0", runtime: false, targets: :rpi3},
       {:nerves_system_rpi4, "~> 2.0", runtime: false, targets: :rpi4},
-      {:nerves_system_rpi5, "~> 2.0", runtime: false, targets: :rpi5},
+      {:nerves_system_rpi5, "~> 2.0", runtime: false, targets: :rpi5}
     ]
   end
 
@@ -73,7 +90,26 @@ defmodule NervesSprinklers.MixProject do
     ]
   end
 
-  # Uncomment the following line if using Phoenix > 1.8.
-  # defp listeners(:host, :dev), do: [Phoenix.CodeReloader]
+  defp aliases do
+    [
+      "assets.build": ["tailwind nerves_sprinklers", "esbuild nerves_sprinklers"],
+      "assets.deploy": [
+        "tailwind nerves_sprinklers --minify",
+        "esbuild nerves_sprinklers --minify",
+        "phx.digest"
+      ],
+      setup: ["deps.get", "assets.build"],
+      ci: [
+        "compile --warnings-as-errors",
+        "format --check-formatted",
+        "credo --strict",
+        "deps.audit",
+        "cmd mix hex.audit",
+        "cmd sh -c \"MIX_ENV=test mix test\""
+      ]
+    ]
+  end
+
+  defp listeners(:host, :dev), do: [Phoenix.CodeReloader]
   defp listeners(_, _), do: []
 end
