@@ -1,6 +1,9 @@
 defmodule NervesSprinklers.Auth do
   @moduledoc false
 
+  alias NervesSprinklers.Repo
+  alias NervesSprinklers.Schema.Settings
+
   @iterations 200_000
   @key_length 32
 
@@ -47,23 +50,20 @@ defmodule NervesSprinklers.Auth do
 
   defp constant_time_compare(_, _), do: false
 
-  # Settings persistence — Phase 1 will replace this with DB-backed Settings schema.
-
-  defp settings_file do
-    Application.get_env(:nerves_sprinklers, :auth_settings_file, "/data/auth_settings.dat")
-  end
-
   defp get_settings do
-    case File.read(settings_file()) do
-      {:ok, bin} -> :erlang.binary_to_term(bin)
-      {:error, _} -> %{}
+    case Repo.one(Settings) do
+      nil -> %{}
+      row -> row
     end
   end
 
-  defp save_settings(settings) do
-    path = settings_file()
-    File.mkdir_p!(Path.dirname(path))
-    File.write!(path, :erlang.term_to_binary(settings))
+  defp save_settings(%{password_hash: hash, password_salt: salt}) do
+    row = Repo.one(Settings) || %Settings{}
+
+    row
+    |> Settings.password_changeset(%{password_hash: hash, password_salt: salt})
+    |> Repo.insert_or_update!()
+
     :ok
   end
 end
