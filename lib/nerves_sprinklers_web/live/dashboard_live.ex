@@ -1,43 +1,60 @@
 defmodule NervesSprinklersWeb.DashboardLive do
   use NervesSprinklersWeb, :live_view
 
+  alias NervesSprinklers.Zones
+
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, zones: [], active_zone: nil, connected_nodes: connected_nodes())}
+    {:ok,
+     socket
+     |> assign(:zones, Zones.list_zones())
+     |> assign(:active_zone, nil)
+     |> assign(:active_run, nil)
+     |> assign(:connected_nodes, Node.list())}
   end
 
   @impl true
   def render(assigns) do
     ~H"""
-    <div>
+    <div class="p-6">
       <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-semibold text-gray-900">Dashboard</h1>
-        <div class="flex items-center gap-2 text-sm text-gray-500">
-          <span class="inline-block w-2 h-2 rounded-full bg-green-400"></span>
-          {length(@connected_nodes) + 1} node(s) online
-        </div>
+        <h1 class="text-2xl font-bold">Dashboard</h1>
+        <span class="text-sm text-gray-500">
+          <%= length(@connected_nodes) + 1 %> node(s) connected
+        </span>
       </div>
 
-      <%= if @zones == [] do %>
-        <div class="rounded-2xl border border-dashed border-gray-300 p-12 text-center">
-          <p class="text-gray-500 text-sm">No zones configured yet.</p>
-          <p class="text-gray-400 text-xs mt-1">Zones will be configured in the next step.</p>
-        </div>
-      <% else %>
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          <%= for zone <- @zones do %>
-            <div class="bg-white rounded-xl border border-gray-200 p-4">
-              <p class="font-medium text-gray-900 text-sm">{zone.name}</p>
-              <p class="text-xs text-gray-400 mt-1">Zone {zone.number}</p>
-            </div>
-          <% end %>
-        </div>
-      <% end %>
+      <section class="mb-8">
+        <h2 class="text-lg font-semibold mb-3">Zones</h2>
+        <%= if @zones == [] do %>
+          <p class="text-gray-500">
+            No zones configured. <.link navigate={~p"/zones"}>Add zones</.link>
+          </p>
+        <% else %>
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <%= for zone <- @zones do %>
+              <div class="border rounded-lg p-4 bg-white shadow-sm">
+                <div class="font-medium"><%= zone.name %></div>
+                <div class="text-sm text-gray-500">Zone <%= zone.number %></div>
+                <div class="text-xs text-gray-400 truncate"><%= zone.node %></div>
+                <button
+                  class="mt-2 w-full text-sm py-1 px-2 rounded bg-gray-100 text-gray-400 cursor-not-allowed"
+                  disabled
+                  title="Manual runs available after Phase 2"
+                >
+                  Run
+                </button>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold mb-3">Upcoming Runs</h2>
+        <p class="text-gray-500">No schedules configured.</p>
+      </section>
     </div>
     """
-  end
-
-  defp connected_nodes do
-    Node.list()
   end
 end

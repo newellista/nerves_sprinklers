@@ -26,9 +26,9 @@ The system supports any number of workers (including zero — coordinator-only i
 - 24VAC transformer powers solenoids; 5V supply powers relay boards
 - Relay pin lists persisted to `/data/relay_pins.dat` per node (survives firmware updates)
 
-## Current State — Phase 0 Complete
+## Current State — Phase 1 Complete
 
-Implemented:
+Phase 0 implemented:
 - `GpioServer` GenServer (reads `/data/relay_pins.dat`, drives pins HIGH, handles `{:open_pin}` / `{:close_pin}` / `{:add_pin}` / `{:remove_pin}`)
 - `ZoneDriver` (routes GPIO calls to local or remote GpioServer by zone.node)
 - `NodeConfig` (role/node name/timezone from config)
@@ -38,12 +38,24 @@ Implemented:
 - libcluster Gossip clustering
 - CI: GitHub Actions (host tests + firmware builds for RPi3/RPi0)
 
-Not yet implemented (Phase 1+):
-- Ecto schemas and migrations
-- Zones/Schedules/History contexts
+Phase 1 implemented:
+- 8 Ecto migrations (`priv/repo/migrations/`) — zones, zone_groups, zone_group_members, schedules, schedule_zones, run history, settings, schedule_snapshots
+- All Ecto schemas with changesets (`lib/nerves_sprinklers/schema/`)
+- `Zones` context — Zone + ZoneGroup CRUD with best-effort GpioServer side-effects
+- `Schedules` context — CRUD with Ecto.Multi version snapshots on every write
+- `Auth` — migrated from file-based store to `settings` DB table
+- `Recurrence` — pure `runs_on?/2` and `next_run_after/3` calculations
+- `ConflictChecker` — 28-day overlap detection across shared zones
+- `DashboardLive` — wired to real zone and node data
+- `ZonesLive` — zone and group management at `/zones` (CRUD + 2-second test relay)
+- `ScheduleLive.Index` — schedule management at `/schedules` (CRUD + conflict detection + zone assignment)
+
+Not yet implemented (Phase 2+):
 - `Scheduler`, `Executor`, `NodeWatcher` GenServers
-- `ConflictChecker`, `Recurrence` pure modules
-- Zones/Schedules/History LiveViews
+- PubSub live updates in DashboardLive
+- Manual run controls
+- Run history LiveView
+- Schedule detail with next-run time
 
 ## Supervisor Tree
 

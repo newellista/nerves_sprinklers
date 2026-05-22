@@ -5,7 +5,7 @@ config :nerves_sprinklers,
   role: :coordinator,
   node_name: :sprinklers@localhost,
   timezone: "America/Chicago",
-  auth_settings_file: Path.expand("../sprinklers_auth_dev.dat", __DIR__)
+  ecto_repos: [NervesSprinklers.Repo]
 
 config :nerves_sprinklers, NervesSprinklersWeb.Endpoint,
   http: [port: 4000],
