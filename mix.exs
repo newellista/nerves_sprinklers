@@ -15,7 +15,8 @@ defmodule NervesSprinklers.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       releases: [{@app, release()}],
-      aliases: aliases()
+      aliases: aliases(),
+      elixirc_paths: elixirc_paths(Mix.env())
     ]
   end
 
@@ -26,6 +27,9 @@ defmodule NervesSprinklers.MixProject do
       mod: {NervesSprinklers.Application, []}
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   def cli do
     [preferred_targets: [run: :host, test: :host]]

@@ -23,12 +23,21 @@ defmodule NervesSprinklers.Application do
 
   defp coordinator_children do
     if NodeConfig.coordinator?() do
-      [
-        NervesSprinklers.Repo,
-        NervesSprinklersWeb.Endpoint
-      ]
+      [NervesSprinklers.Repo] ++
+        migrator_children() ++
+        [NervesSprinklersWeb.Endpoint]
     else
       []
+    end
+  end
+
+  defp migrator_children do
+    repo_config = Application.get_env(:nerves_sprinklers, NervesSprinklers.Repo, [])
+
+    if repo_config[:pool] == Ecto.Adapters.SQL.Sandbox do
+      []
+    else
+      [{Ecto.Migrator, repos: Application.fetch_env!(:ecto, :repos), log_migrations_sql: false}]
     end
   end
 end

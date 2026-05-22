@@ -23,3 +23,5 @@ if Mix.target() == :host do
 else
   import_config "target.exs"
 end
+
+if Mix.env() == :test, do: import_config("test.exs")
