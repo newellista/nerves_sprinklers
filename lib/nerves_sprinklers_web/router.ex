@@ -34,6 +34,9 @@ defmodule NervesSprinklersWeb.Router do
       live("/zones", ZonesLive, :index)
       live("/zones/new", ZonesLive, :new)
       live("/zones/:id/edit", ZonesLive, :edit)
+      live("/schedules", ScheduleLive.Index, :index)
+      live("/schedules/new", ScheduleLive.Index, :new)
+      live("/schedules/:id/edit", ScheduleLive.Index, :edit)
     end
   end
 end

@@ -17,6 +17,13 @@ defmodule NervesSprinklers.Schedules do
     Repo.get!(Schedule, id)
   end
 
+  def list_schedule_zones(schedule) do
+    ScheduleZone
+    |> where([sz], sz.schedule_id == ^schedule.id)
+    |> order_by([sz], sz.position)
+    |> Repo.all()
+  end
+
   def create_schedule(attrs) do
     Multi.new()
     |> Multi.insert(:schedule, Schedule.changeset(%Schedule{}, attrs))
@@ -114,6 +121,10 @@ defmodule NervesSprinklers.Schedules do
       {:error, _op, reason, _} ->
         {:error, reason}
     end
+  end
+
+  def change_schedule(%Schedule{} = schedule, attrs \\ %{}) do
+    Schedule.changeset(schedule, attrs)
   end
 
   def list_snapshots(schedule_id) do
