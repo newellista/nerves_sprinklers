@@ -21,6 +21,10 @@ defmodule NervesSprinklers.Zones do
     Repo.get!(Zone, id)
   end
 
+  def change_zone(%Zone{} = zone, attrs \\ %{}) do
+    Zone.changeset(zone, attrs)
+  end
+
   def get_zone_by_number!(number) do
     Repo.get_by!(Zone, number: number)
   end

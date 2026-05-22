@@ -27,7 +27,9 @@ defmodule NervesSprinklersWeb.DashboardLive do
       <section class="mb-8">
         <h2 class="text-lg font-semibold mb-3">Zones</h2>
         <%= if @zones == [] do %>
-          <p class="text-gray-500">No zones configured.</p>
+          <p class="text-gray-500">
+            No zones configured. <.link navigate={~p"/zones"}>Add zones</.link>
+          </p>
         <% else %>
           <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             <%= for zone <- @zones do %>

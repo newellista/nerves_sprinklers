@@ -31,6 +31,9 @@ defmodule NervesSprinklersWeb.Router do
       on_mount: [{NervesSprinklersWeb.Auth, :require_authenticated}] do
       live("/", DashboardLive, :index)
       live("/settings", SettingsLive, :index)
+      live("/zones", ZonesLive, :index)
+      live("/zones/new", ZonesLive, :new)
+      live("/zones/:id/edit", ZonesLive, :edit)
     end
   end
 end
