@@ -37,6 +37,8 @@ defmodule NervesSprinklersWeb.Router do
       live("/schedules", ScheduleLive.Index, :index)
       live("/schedules/new", ScheduleLive.Index, :new)
       live("/schedules/:id/edit", ScheduleLive.Index, :edit)
+      live("/schedules/:id", ScheduleLive.Show, :show)
+      live("/history", HistoryLive, :index)
     end
   end
 end

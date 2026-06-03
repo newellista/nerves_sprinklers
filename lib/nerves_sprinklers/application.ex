@@ -25,9 +25,25 @@ defmodule NervesSprinklers.Application do
     if NodeConfig.coordinator?() do
       [NervesSprinklers.Repo] ++
         migrator_children() ++
+        [
+          {Phoenix.PubSub, name: NervesSprinklers.PubSub},
+          NervesSprinklers.Cluster.NodeWatcher,
+          NervesSprinklers.Executor.Executor
+        ] ++
+        scheduler_children() ++
         [NervesSprinklersWeb.Endpoint]
     else
       []
+    end
+  end
+
+  defp scheduler_children do
+    repo_config = Application.get_env(:nerves_sprinklers, NervesSprinklers.Repo, [])
+
+    if repo_config[:pool] == Ecto.Adapters.SQL.Sandbox do
+      []
+    else
+      [NervesSprinklers.Scheduler.Scheduler]
     end
   end
 
