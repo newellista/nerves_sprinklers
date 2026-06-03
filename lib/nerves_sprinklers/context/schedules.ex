@@ -5,6 +5,7 @@ defmodule NervesSprinklers.Schedules do
 
   alias Ecto.Multi
   alias NervesSprinklers.Repo
+  alias NervesSprinklers.Scheduler.Scheduler
   alias NervesSprinklers.Schema.{Schedule, ScheduleSnapshot, ScheduleZone}
 
   def list_schedules do
@@ -33,7 +34,8 @@ defmodule NervesSprinklers.Schedules do
     |> Repo.transaction()
     |> case do
       {:ok, %{schedule: schedule}} ->
-        # TODO: notify Scheduler
+        if Process.whereis(Scheduler), do: Scheduler.reload()
+
         {:ok, schedule}
 
       {:error, :schedule, changeset, _} ->
@@ -53,7 +55,8 @@ defmodule NervesSprinklers.Schedules do
     |> Repo.transaction()
     |> case do
       {:ok, %{schedule: schedule}} ->
-        # TODO: notify Scheduler
+        if Process.whereis(Scheduler), do: Scheduler.reload()
+
         {:ok, schedule}
 
       {:error, :schedule, changeset, _} ->
@@ -115,7 +118,8 @@ defmodule NervesSprinklers.Schedules do
     |> Repo.transaction()
     |> case do
       {:ok, _} ->
-        # TODO: notify Scheduler
+        if Process.whereis(Scheduler), do: Scheduler.reload()
+
         {:ok, Repo.preload(Repo.get!(Schedule, schedule.id), schedule_zones: :zone)}
 
       {:error, _op, reason, _} ->

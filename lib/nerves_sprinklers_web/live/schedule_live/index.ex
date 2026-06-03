@@ -4,6 +4,7 @@ defmodule NervesSprinklersWeb.ScheduleLive.Index do
   use NervesSprinklersWeb, :live_view
 
   alias NervesSprinklers.Config.NodeConfig
+  alias NervesSprinklers.Executor.Executor
   alias NervesSprinklers.Scheduler.ConflictChecker
   alias NervesSprinklers.{Schedules, Zones}
   alias NervesSprinklers.Schema.Schedule
@@ -120,6 +121,18 @@ defmodule NervesSprinklersWeb.ScheduleLive.Index do
     {:noreply, assign(socket, :schedules, Schedules.list_schedules())}
   end
 
+  def handle_event("run_schedule", %{"id" => id}, socket) do
+    schedule = Schedules.get_schedule!(String.to_integer(id))
+
+    case Executor.start_run(schedule, :manual) do
+      :ok ->
+        {:noreply, put_flash(socket, :info, "Started run for \"#{schedule.name}\".")}
+
+      {:error, :busy} ->
+        {:noreply, put_flash(socket, :error, "A run is already in progress.")}
+    end
+  end
+
   def handle_event("add_zone", %{"zone_id" => zone_id}, socket) do
     zone_id_int = String.to_integer(zone_id)
     already_added = Enum.any?(socket.assigns.zone_assignments, &(&1.zone_id == zone_id_int))
@@ -234,11 +247,24 @@ defmodule NervesSprinklersWeb.ScheduleLive.Index do
               <td class="px-4 py-3 text-sm text-gray-400">—</td>
               <td class="px-4 py-3 text-sm space-x-2">
                 <.link
+                  navigate={~p"/schedules/#{schedule.id}"}
+                  class="text-gray-600 hover:text-gray-800 font-medium"
+                >
+                  View
+                </.link>
+                <.link
                   navigate={~p"/schedules/#{schedule.id}/edit"}
                   class="text-blue-600 hover:text-blue-800 font-medium"
                 >
                   Edit
                 </.link>
+                <button
+                  phx-click="run_schedule"
+                  phx-value-id={schedule.id}
+                  class="text-green-600 hover:text-green-800 font-medium"
+                >
+                  Run
+                </button>
                 <button
                   phx-click="delete"
                   phx-value-id={schedule.id}

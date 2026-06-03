@@ -121,16 +121,20 @@ defmodule NervesSprinklers.Gpio.GpioServer do
     end
   end
 
-  defp save_pins(pins) do
-    File.mkdir_p!(Path.dirname(@pins_file))
-    File.write!(@pins_file, :erlang.term_to_binary(pins))
-  end
-
   defp open_pins_high(pins) do
     Map.new(pins, fn pin -> {pin, gpio_open(pin)} end)
   end
 
-  # GPIO dispatch — uses circuits_gpio on target, no-op stub on host
+  # Pin file persistence and GPIO dispatch — no-ops on host
+
+  if Mix.target() == :host do
+    defp save_pins(_pins), do: :ok
+  else
+    defp save_pins(pins) do
+      File.mkdir_p!(Path.dirname(@pins_file))
+      File.write!(@pins_file, :erlang.term_to_binary(pins))
+    end
+  end
 
   if Mix.target() == :host do
     defp gpio_open(pin) do
